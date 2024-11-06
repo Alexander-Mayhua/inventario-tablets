@@ -8,9 +8,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $dni = $_POST['dni'];
     $tipo_persona = $_POST['tipo_persona'];
     $contacto = $_POST['contacto'];
-    
+    $grado_id = $_POST["grado_id"];
+    $seccion_id = $_POST["seccion_id"];
 
-    $sql = "INSERT INTO personas (nombre,apellido,dni,tipo_persona,contacto) VALUES ('$nombre','$apellido', '$dni','$tipo_persona','$contacto')";
+      // Validar que los valores de grado_id y seccion_id existan en las tablas correspondientes
+      $sql_grado = "SELECT COUNT(*) FROM grados WHERE id = $grado_id";
+      $result_grado = $conn->query($sql_grado);
+      $row_grado = $result_grado->fetch_row();
+      if ($row_grado[0] == 0) {
+          echo "Error: El grado seleccionado no existe.";
+          exit;
+      }
+  
+      $sql_seccion = "SELECT COUNT(*) FROM secciones WHERE id = $seccion_id";
+      $result_seccion = $conn->query($sql_seccion);
+      $row_seccion = $result_seccion->fetch_row();
+      if ($row_seccion[0] == 0) {
+          echo "Error: La sección seleccionada no existe.";
+          exit;
+      }
+  
+
+    $sql = "INSERT INTO personas (nombre,apellido,dni,tipo_persona,contacto,grado_id,seccion_id) VALUES ('$nombre','$apellido', '$dni','$tipo_persona','$contacto','$grado_id', '$seccion_id')";
     if ($conn->query($sql) === TRUE) {
         echo "Nueva persona agregado con éxito";
         header("Location: persona.php");
@@ -18,6 +37,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
 }
+
+// Obtener los datos de grados y secciones para llenar los campos del formulario
+$sql_grados = "SELECT * FROM grados";
+$result_grados = $conn->query($sql_grados);
+
+$sql_secciones = "SELECT * FROM secciones";
+$result_secciones = $conn->query($sql_secciones);
 ?>
 
 <!DOCTYPE html>
@@ -159,6 +185,69 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             Por favor seleccione el contacto.
                         </div>
                     </div>
+ <!-- grados -->
+ <div class="col-md-4 mb-3">
+                    <label for="grado_id" class="form-label">Grados</label>
+                    <select class="form-select" id="grado_id" name="grado_id" required>
+                    <option value="">Seleccionar Grado</option>
+                <?php while ($row_grado = $result_grados->fetch_assoc()) { ?>
+                    <option value="<?php echo $row_grado["id"]; ?>"><?php echo $row_grado["nombre_grado"]; ?></option>
+                <?php } ?>
+                    </select>
+                    <div class="invalid-feedback">
+                        Por favor seleccione el el grado.
+                    </div>
+                </div>
+ <!-- secciones -->
+ <div class="col-md-4 mb-3">
+                    <label for="seccion_id" class="form-label">Secciones</label>
+                    <?php
+            $sql_grados = "SELECT * FROM inventariotabletas_grados";
+            $result_grados = $conn->query($sql_grados);
+            while ($row_grado = $result_grados->fetch_assoc()) {
+                echo "<option value='" . $row_grado["id"] . "'>" . $row_grado["nombre_grado"] . "</option>";
+            }
+            ?>
+                    </select>
+                    <div class="invalid-feedback">
+                        Por favor seleccione el tipo_persona.
+                    </div>
+                </div>
+
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <button type="button" class="btn btn-secondary btn-agregar" onclick="history.back()">
+                    <i class="bi bi-x-circle me-2"></i>
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary btn-agregar">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Agregar Persona
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Validación del formulario
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
 
 
                 <!-- Botones -->

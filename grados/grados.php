@@ -3,14 +3,8 @@
 session_start();
 include '../conexion/conexion.php';
 
-// Consulta SQL con JOIN para obtener el nombre del grado y de la sección
-$sql = "
-    SELECT personas.id, personas.nombre, personas.apellido, personas.dni, personas.tipo_persona, personas.contacto,
-           grados.nombre_grado, secciones.nombre_seccion
-    FROM personas
-    LEFT JOIN grados ON personas.grado_id = grados.id
-    LEFT JOIN secciones ON personas.seccion_id = secciones.id
-";
+// Obtener todas las tabletas
+$sql = "SELECT * FROM grados";
 $result = $conn->query($sql);
 ?>
 
@@ -163,43 +157,31 @@ $result = $conn->query($sql);
 
                    <!--contenido-->
                    <div class="container mt-5">
-                   <a href="persona.php" class="btn btn-success mb-3">primer</a>
-                   <a href="../grados/grados.php" class="btn btn-success mb-3">grado</a>
-                   <a href="../secciones/secciones.php" class="btn btn-success mb-3">seciones</a>
-                        <h2>primer grado</h2>
-                        <a href="agregar_persona.php" class="btn btn-success mb-3">Agregar Estudiante</a>
+                   
+                        <h2>lista grados</h2>
+                        <a href="../grados/agregar_grados.php" class="btn btn-success mb-3">Agregar Grados</a>
                        
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>nombre</th>
-                                    <th>apellido</th>
-                                    <th>dni</th>
-                                    <th>tipo_persona</th>
-                                    <th>contacto</th>
-                                    <th>Grado</th>
-                                    <th>Sección</th>
-                                    <th>Acciones</th>
+                                    <th>acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                            <?php while ($row = $result->fetch_assoc()) { ?>
+                                <?php while ($row = $result->fetch_assoc()) : ?>
                                     <tr>
                                         <td><?php echo $row['id']; ?></td>
-                                        <td><?php echo $row['nombre']; ?></td>
-                                        <td><?php echo $row['apellido']; ?></td>
-                                        <td><?php echo $row['dni']; ?></td>
-                                        <td><?php echo $row['tipo_persona']; ?></td>
-                                        <td><?php echo $row['contacto']; ?></td>
                                         <td><?php echo $row['nombre_grado']; ?></td>
-                                        <td><?php echo $row['nombre_seccion']; ?></td>
+                                        
+                                       
                                         <td>
                                             <a href="editar_persona.php?id=<?php echo $row['id']; ?>" class="btn btn-warning">Editar</a>
                                             <a href="eliminar_persona.php?id=<?php echo $row['id']; ?>" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta persona?');">Eliminar</a>
                                         </td>
                                     </tr>
-                                <?php } ?>
+                                <?php endwhile; ?>
                             </tbody>
                         </table>
                     </div>
